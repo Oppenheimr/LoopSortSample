@@ -6,20 +6,20 @@ namespace GamePlay.Level
 {
     public class ConveyorBelt : MonoBehaviour
     {
-        [SerializeField] private float speed = 3f;
-        [SerializeField] private float acceleration = 15f;
-        [SerializeField] private Spline.Direction direction = Spline.Direction.Forward;
+        [SerializeField] private float _speed = 3f;
+        [SerializeField] private float _acceleration = 15f;
+        [SerializeField] private Spline.Direction _direction = Spline.Direction.Forward;
 
         [Header("Containment (invisible walls)")]
-        [SerializeField] private float halfWidth = 1.5f;
-        [SerializeField] private float maxHeight = 2f;
-        [SerializeField] private bool drawContainment = true;
+        [SerializeField] private float _halfWidth = 1.5f;
+        [SerializeField] private float _maxHeight = 2f;
+        [SerializeField] private bool _drawContainment = true;
 
         private SplineComputer _spline;
         private SplineSample _sample = new();
         private readonly List<Rigidbody> _cubes = new();
 
-        public float Speed { get => speed; set => speed = value; }
+        public float Speed { get => _speed; set => _speed = value; }
         public int Count => _cubes.Count;
         public IReadOnlyList<Rigidbody> Cubes => _cubes;
         public SplineComputer Computer => _spline;
@@ -28,11 +28,11 @@ namespace GamePlay.Level
             float halfWidth, float maxHeight)
         {
             _spline = spline;
-            this.speed = speed;
-            this.acceleration = acceleration;
-            this.direction = direction;
-            this.halfWidth = halfWidth;
-            this.maxHeight = maxHeight;
+            this._speed = speed;
+            this._acceleration = acceleration;
+            this._direction = direction;
+            this._halfWidth = halfWidth;
+            this._maxHeight = maxHeight;
         }
 
         public void Add(Rigidbody cube)
@@ -69,7 +69,7 @@ namespace GamePlay.Level
         {
             if (_spline == null) return;
 
-            float dir = direction == Spline.Direction.Backward ? -1f : 1f;
+            float dir = _direction == Spline.Direction.Backward ? -1f : 1f;
 
             for (int i = _cubes.Count - 1; i >= 0; i--)
             {
@@ -80,7 +80,7 @@ namespace GamePlay.Level
                 Vector3 tangent = _sample.forward.normalized * dir;
 
                 float along = Vector3.Dot(rb.velocity, tangent);
-                rb.AddForce(tangent * ((speed - along) * acceleration), ForceMode.Acceleration);
+                rb.AddForce(tangent * ((_speed - along) * _acceleration), ForceMode.Acceleration);
 
                 Contain(rb);
             }
@@ -94,17 +94,17 @@ namespace GamePlay.Level
             Vector3 offset = rb.position - _sample.position;
 
             float lateral = Vector3.Dot(offset, right);
-            if (Mathf.Abs(lateral) > halfWidth)
+            if (Mathf.Abs(lateral) > _halfWidth)
             {
-                rb.position -= right * (lateral - Mathf.Sign(lateral) * halfWidth);
+                rb.position -= right * (lateral - Mathf.Sign(lateral) * _halfWidth);
                 float vLat = Vector3.Dot(rb.velocity, right);
                 rb.velocity -= right * vLat;
             }
 
             float vertical = Vector3.Dot(offset, up);
-            if (vertical > maxHeight)
+            if (vertical > _maxHeight)
             {
-                rb.position -= up * (vertical - maxHeight);
+                rb.position -= up * (vertical - _maxHeight);
                 float vUp = Vector3.Dot(rb.velocity, up);
                 if (vUp > 0f) rb.velocity -= up * vUp;
             }
@@ -112,7 +112,7 @@ namespace GamePlay.Level
 
         private void OnDrawGizmos()
         {
-            if (!drawContainment || _spline == null) return;
+            if (!_drawContainment || _spline == null) return;
 
             const int steps = 80;
             Gizmos.color = Color.cyan;
@@ -125,10 +125,10 @@ namespace GamePlay.Level
                 Vector3 up = s.up.normalized;
                 Vector3 right = Vector3.Cross(up, fwd).normalized;
 
-                Vector3 L = s.position + right * halfWidth;
-                Vector3 R = s.position - right * halfWidth;
-                Vector3 LT = L + up * maxHeight;
-                Vector3 RT = R + up * maxHeight;
+                Vector3 L = s.position + right * _halfWidth;
+                Vector3 R = s.position - right * _halfWidth;
+                Vector3 LT = L + up * _maxHeight;
+                Vector3 RT = R + up * _maxHeight;
 
                 if (i > 0)
                 {
