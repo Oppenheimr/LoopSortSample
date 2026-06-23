@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using Core;
 using Data.Levels;
+using Game.Levels;
 using GamePlay.Entity;
 using UnityEngine;
 
-namespace Game.Levels
+namespace GamePlay.Level
 {
     public class LevelController : MonoBehaviour
     {
@@ -22,7 +23,7 @@ namespace Game.Levels
         private readonly List<Rigidbody> _scratch = new();
         private readonly HashSet<Truck> _unstacking = new();
         private readonly Dictionary<Truck, int> _loading = new();
-        private Camera _cam;
+        private UnityEngine.Camera _cam;
         private GameObject _level;
         private int _pendingTransfers;
         private bool _won;
@@ -31,7 +32,7 @@ namespace Game.Levels
         {
             if (generator == null || _won || !Input.GetMouseButtonDown(0)) return;
 
-            if (_cam == null) _cam = Camera.main != null ? Camera.main : FindObjectOfType<Camera>();
+            if (_cam == null) _cam = UnityEngine.Camera.main != null ? UnityEngine.Camera.main : FindObjectOfType<UnityEngine.Camera>();
             if (_cam == null) return;
 
             var ray = _cam.ScreenPointToRay(Input.mousePosition);

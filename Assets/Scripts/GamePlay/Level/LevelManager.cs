@@ -1,26 +1,31 @@
 using Core;
 using Data.Levels;
+using Game.Levels;
 using UnityEngine;
 using UnityUtils.Attribute;
 
-namespace Game.Levels
+namespace GamePlay.Level
 {
     public class LevelManager : MonoBehaviour
     {
         [SerializeField, AutoAssign] private LevelGenerator _generator;
-        [SerializeField] private bool _generateOnStart = true;
+        private int CurrentIndex { get; set; }
 
-        public int CurrentIndex { get; private set; }
-
-        private void OnEnable() => EventDispatcher.OnClickNextLevel.AddListener(NextLevel);
-        private void OnDisable() => EventDispatcher.OnClickNextLevel.RemoveListener(NextLevel);
-
-        private void Start()
+        private void OnEnable()
         {
-            if (_generateOnStart) Load(0);
+            EventDispatcher.OnClickNextLevel.AddListener(NextLevel);
+            EventDispatcher.OnGamePlay.AddListener(LoadFirst);
+        }
+  
+        private void OnDisable()
+        {
+            EventDispatcher.OnClickNextLevel.RemoveListener(NextLevel);
+            EventDispatcher.OnGamePlay.RemoveListener(LoadFirst);
         }
 
-        public void Load(int index)
+        private void LoadFirst() => Load(0);
+
+        private void Load(int index = 0)
         {
             var data = LevelData.Instance;
             if (data == null || _generator == null)
@@ -39,7 +44,7 @@ namespace Game.Levels
             EventDispatcher.OnLevelChangedEvent(CurrentIndex);
         }
 
-        public void NextLevel() => Load(CurrentIndex + 1);
+        private void NextLevel() => Load(CurrentIndex + 1);
 
         [ContextMenu("Generate (Editor Test)")]
         private void EditorGenerate() => Load(CurrentIndex);

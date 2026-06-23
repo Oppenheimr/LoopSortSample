@@ -1,4 +1,5 @@
 using Game.Levels;
+using GamePlay.Level;
 using UnityEngine;
 
 namespace GamePlay.Camera

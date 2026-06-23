@@ -18,5 +18,7 @@ namespace UI
             EventDispatcher.OnClickNextLevelEvent();
             _endPanel.Hide();
         }
+
+        public void OnClickPlay() => EventDispatcher.OnGamePlayEvent();
     }
 }

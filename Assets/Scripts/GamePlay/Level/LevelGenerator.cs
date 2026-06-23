@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using Data.Levels;
+using Game.Levels;
 using GamePlay.Entity;
 using UnityEngine;
 
-namespace Game.Levels
+namespace GamePlay.Level
 {
     public class LevelGenerator : MonoBehaviour
     {
@@ -28,7 +29,7 @@ namespace Game.Levels
         public IReadOnlyList<Truck> Trucks => _trucks;
         public CubeFactory Cubes => _cubeFactory;
 
-        public GameObject Generate(Level level)
+        public GameObject Generate(Data.Levels.Level level)
         {
             if (level == null)
             {
