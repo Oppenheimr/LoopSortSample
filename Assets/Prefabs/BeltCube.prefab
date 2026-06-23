@@ -121,7 +121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: -2673711795980658022}
   _collider: {fileID: 8666264248524120963}
-  _renderer: {fileID: 3697410607695905712}
+  rendererComponent: {fileID: 3697410607695905712}
   color: 0
 --- !u!54 &-2673711795980658022
 Rigidbody:

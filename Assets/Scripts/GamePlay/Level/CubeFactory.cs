@@ -15,6 +15,7 @@ namespace GamePlay.Level
         [SerializeField] private int _stackPoolSize = 256;
         [SerializeField] private int _beltPoolSize = 128;
 
+        private readonly HashSet<Cube> _active = new();
         private Dictionary<CubeColor, Material> _materials;
         private int _stackPoolKey = -1;
         private int _beltPoolKey = -1;
@@ -26,19 +27,18 @@ namespace GamePlay.Level
         {
             if (_stackCubePrefab == null) return 1f;
 
-            var temp = Instantiate(_stackCubePrefab);
-            temp.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            var cube = Instantiate(_stackCubePrefab);
+            cube.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
             float size = 1f;
-            var renderer = temp.GetComponentInChildren<Renderer>();
-            if (renderer != null)
+            if (cube.rendererComponent != null)
             {
-                var s = renderer.bounds.size;
+                var s = cube.rendererComponent.bounds.size;
                 size = Mathf.Max(s.x, s.y, s.z);
             }
 
-            if (Application.isPlaying) Destroy(temp.gameObject);
-            else DestroyImmediate(temp.gameObject);
+            if (Application.isPlaying) Destroy(cube.gameObject);
+            else DestroyImmediate(cube.gameObject);
             return size;
         }
 
@@ -50,6 +50,7 @@ namespace GamePlay.Level
             cube.SetColor(Material(color));
             cube.color = color;
             cube.SetTrigger(true);
+            _active.Add(cube);
             return cube;
         }
 
@@ -62,12 +63,25 @@ namespace GamePlay.Level
             cube.SetColor(Material(color));
             cube.color = color;
 
-            var rb = cube.GetComponent<Rigidbody>();
-            if (rb != null) rb.isKinematic = true;
+            cube.SetKinematic(true);
+            _active.Add(cube);
             return cube;
         }
 
         public void Despawn(Cube cube)
+        {
+            if (cube == null) return;
+            _active.Remove(cube);
+            Return(cube);
+        }
+
+        public void DespawnAll()
+        {
+            foreach (var cube in _active) Return(cube);
+            _active.Clear();
+        }
+
+        private void Return(Cube cube)
         {
             if (cube == null) return;
             if (cube.poolKey >= 0) ObjectPooler.PutPoolObject(cube.poolKey, cube);

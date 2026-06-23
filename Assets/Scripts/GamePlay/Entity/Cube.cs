@@ -8,7 +8,7 @@ namespace GamePlay.Entity
     {
         [SerializeField, AutoAssign] private Rigidbody _rigidbody;
         [SerializeField, AutoAssign] private Collider _collider;
-        [SerializeField, AutoAssign] private Renderer _renderer;
+        [AutoAssign] public Renderer rendererComponent;
         public CubeColor color;
 
         // Belt cubes only: cleared once the cube has travelled away (prevents instant snap-back).
@@ -25,9 +25,9 @@ namespace GamePlay.Entity
 
         public void SetColor(Material material)
         {
-            if (!_renderer)
+            if (!rendererComponent)
                 return;
-            _renderer.sharedMaterial = material;
+            rendererComponent.sharedMaterial = material;
         }
 
         public void SetAngularVelocity(Vector3 velocityVector)
@@ -35,6 +35,13 @@ namespace GamePlay.Entity
             if (!_rigidbody)
                 return;
             _rigidbody.angularVelocity = velocityVector;
+        }
+
+        public void SetKinematic(bool isKinematic)
+        {
+            if (!_rigidbody)
+                return;
+            _rigidbody.isKinematic = isKinematic;
         }
     }
 }

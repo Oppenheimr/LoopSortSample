@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Core
@@ -14,7 +15,7 @@ namespace Core
         // Level Events
         public static readonly UnityEvent OnLevelComplete = new();
         public static readonly UnityEvent OnClickNextLevel = new();
-        public static readonly UnityEvent<int> OnLevelChanged = new();
+        public static readonly UnityEvent<GameObject> OnLevelChanged = new();
         
         public static readonly UnityEvent OnPlayerReady = new();
         public static readonly UnityEvent<int> OnUnitPurchased = new();
@@ -29,7 +30,7 @@ namespace Core
         public static void OnGameRestartEvent() => OnGameRestart?.Invoke();
         
         // Level Events
-        public static void OnLevelChangedEvent(int level) => OnLevelChanged?.Invoke(level);
+        public static void OnLevelChangedEvent(GameObject levelRoot) => OnLevelChanged?.Invoke(levelRoot);
         public static void OnClickNextLevelEvent() => OnClickNextLevel?.Invoke();
         public static void OnLevelCompleteEvent() => OnLevelComplete?.Invoke();
         

@@ -41,7 +41,7 @@ namespace GamePlay.Level
 
             CurrentIndex = ((index % data.Count) + data.Count) % data.Count;
             _generator.Generate(data.Get(CurrentIndex));
-            EventDispatcher.OnLevelChangedEvent(CurrentIndex);
+            EventDispatcher.OnLevelChangedEvent(_generator.Current);
         }
 
         private void NextLevel() => Load(CurrentIndex + 1);

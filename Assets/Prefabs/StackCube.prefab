@@ -96,6 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1f8fb62e5dc85e409d283390a5f28f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rigidbody: {fileID: 0}
   _collider: {fileID: 0}
-  _renderer: {fileID: 3697410607695905712}
+  rendererComponent: {fileID: 3697410607695905712}
   color: 0

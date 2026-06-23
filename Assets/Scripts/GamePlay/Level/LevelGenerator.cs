@@ -57,16 +57,10 @@ namespace GamePlay.Level
         {
             if (_current == null) return;
 
-            if (Application.isPlaying)
-            {
-                foreach (var cube in _current.GetComponentsInChildren<Cube>(true))
-                    _cubeFactory.Despawn(cube);
-                Destroy(_current);
-            }
-            else
-            {
-                DestroyImmediate(_current);
-            }
+            _cubeFactory.DespawnAll();
+
+            if (Application.isPlaying) Destroy(_current);
+            else DestroyImmediate(_current);
 
             _current = null;
             _belt = null;
