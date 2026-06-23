@@ -1,0 +1,74 @@
+Documentation
+
+
+Folder Ordering
+
+    Art
+        => Animations
+        => Audios
+        => Fonts
+        => Materials
+        => Models               
+        => UI_Sample
+    Local Packages    
+        => TextMeshPro
+    Plugins
+        => DOTween
+    Prefabs
+    Resources
+        => Scriptables
+    Scenes   
+    Scripts
+        => Core
+        => Editor
+        => GamePlay
+        => UI
+        => Unity Utils
+    Settings
+        
+Example
+
+    1-a Order of Script Folders
+        => Core : Managers
+        => Editor : For code that will only work in the editor during the game and not after compilation
+        => GamePlay : All in-game actions and mechanics
+        => UI : Classes that run in the User Interface
+        => Unity Utils : Extensions Helpers & Base Classes
+    
+    1-b Places inspired by coding
+        => Texture Painting : Painter.cs
+            - https://www.youtube.com/watch?v=XozHdfHrb1U
+            - https://drive.google.com/file/d/1mUzVd_ThkFoypqVbFkVN4aLnCmXFdnDQ/view          
+        
+        => Conveyor Belt : RotatingPlatform.cs
+            - https://www.youtube.com/watch?v=bbIXjQOzcVk&t=460s
+            
+    1-c DESIGNS
+        1-c.1 => OOP Examples : Character.cs, TriggerParticle.cs, SingletonBehavior.cs (& UnityUtils>BaseClasses> ...cs)
+        1-c.2 => Singleton Examples : JoystickController.cs, SingletonBehavior.cs
+        1-c.3 => Events Example : EventHandler.cs
+        1-c.4 => Object-Pooling Example : PoolManager.cs
+
+2- Assets
+    2.a- Scripting 
+        => Utils Library : Personal Content (Developed by Umutcan Bağcı)
+        => EditorHelper.cs : Personal Content (Developed by Umutcan Bağcı)
+        => Joystick : https://assetstore.unity.com/packages/tools/input-management/joystick-pack-107631
+        => AutRagdoller.cs : https://assetstore.unity.com/packages/templates/packs/mfps-mobile-245213
+        
+    2.b- Visual Contents 
+        => Utils Library : Personal Content (Developed by Umutcan Bağcı)
+        => Water Texture : https://assetstore.unity.com/packages/2d/textures-materials/water/stylize-water-texture-153577 (Edited)
+        
+    2c- Animations
+        => Pack : https://www.mixamo.com/#/?limit=96&page=1&query=Male+Drunk+Pack
+        
+    2d- Musics
+        => Background : https://assetstore.unity.com/packages/audio/music/101-song-hyper-casual-music-mega-pack-187586
+        => SFX : https://assetstore.unity.com/packages/audio/sound-fx/free-casual-game-sfx-pack-54116#content
+        
+        skull icon https://www.freeiconspng.com/downloadimg/5244
+        
+        
+       
+Note : If you want to look at the tool I wrote to create characters : Assets>Scripts>Editor>CreateCharacterWizard.cs
