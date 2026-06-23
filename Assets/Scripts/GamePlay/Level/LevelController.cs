@@ -85,8 +85,7 @@ namespace GamePlay.Level
             yield return MoveSpin(cube.transform, from, to, _transferDuration, axis, null);
 
             _generator.Belt.Place(cube.gameObject);
-            var rb = cube.GetComponent<Rigidbody>();
-            if (rb != null) rb.angularVelocity = Random.onUnitSphere * _landTumble;
+            cube.SetAngularVelocity(Random.onUnitSphere * _landTumble);
             _pendingTransfers--;
         }
 

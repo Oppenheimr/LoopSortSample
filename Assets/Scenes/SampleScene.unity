@@ -200,13 +200,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97ea3fdf52a61ca46b7ef424d9e874be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generator: {fileID: 175318002}
-  dockRadius: 0.9
-  transferDuration: 0.15
-  unstackInterval: 0.1
-  unstackHeight: 0.3
-  flightSpin: 540
-  landTumble: 6
+  _generator: {fileID: 175318002}
+  _dockRadius: 0.9
+  _transferDuration: 0.15
+  _unstackInterval: 0.1
+  _unstackHeight: 0.3
+  _flightSpin: 540
+  _landTumble: 6
 --- !u!114 &175318005
 MonoBehaviour:
   m_ObjectHideFlags: 0

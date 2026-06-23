@@ -6,6 +6,7 @@ namespace GamePlay.Entity
 {
     public class Cube : MonoBehaviour
     {
+        [SerializeField, AutoAssign] private Rigidbody _rigidbody;
         [SerializeField, AutoAssign] private Collider _collider;
         [SerializeField, AutoAssign] private Renderer _renderer;
         public CubeColor color;
@@ -27,6 +28,13 @@ namespace GamePlay.Entity
             if (!_renderer)
                 return;
             _renderer.sharedMaterial = material;
+        }
+
+        public void SetAngularVelocity(Vector3 velocityVector)
+        {
+            if (!_rigidbody)
+                return;
+            _rigidbody.angularVelocity = velocityVector;
         }
     }
 }
