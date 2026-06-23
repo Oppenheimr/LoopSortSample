@@ -5,20 +5,21 @@ using Data.Levels;
 using Game.Levels;
 using GamePlay.Entity;
 using UnityEngine;
+using UnityUtils.Attribute;
 
 namespace GamePlay.Level
 {
     public class LevelController : MonoBehaviour
     {
-        [SerializeField] private LevelGenerator generator;
-        [SerializeField, Min(0.1f)] private float dockRadius = 1.5f;
+        [SerializeField, AutoAssign] private LevelGenerator _generator;
+        [SerializeField, Min(0.1f)] private float _dockRadius = .9f;
 
         [Header("Animation")]
-        [SerializeField] private float transferDuration = 0.3f;
-        [SerializeField] private float unstackInterval = 0.08f;
-        [SerializeField] private float unstackHeight = 0.3f;
-        [SerializeField] private float flightSpin = 540f;
-        [SerializeField] private float landTumble = 6f;
+        [SerializeField] private float _transferDuration = 0.15f;
+        [SerializeField] private float _unstackInterval = 0.1f;
+        [SerializeField] private float _unstackHeight = 0.3f;
+        [SerializeField] private float _flightSpin = 540f;
+        [SerializeField] private float _landTumble = 6f;
 
         private readonly List<Rigidbody> _scratch = new();
         private readonly HashSet<Truck> _unstacking = new();
@@ -30,7 +31,7 @@ namespace GamePlay.Level
 
         private void Update()
         {
-            if (generator == null || _won || !Input.GetMouseButtonDown(0)) return;
+            if (_generator == null || _won || !Input.GetMouseButtonDown(0)) return;
 
             if (_cam == null) _cam = UnityEngine.Camera.main != null ? UnityEngine.Camera.main : FindObjectOfType<UnityEngine.Camera>();
             if (_cam == null) return;
@@ -65,13 +66,13 @@ namespace GamePlay.Level
             {
                 var popped = truck.PopTop();
                 Vector3 slotWorld = popped.transform.position;
-                generator.Cubes.Despawn(popped);
+                _generator.Cubes.Despawn(popped);
 
-                var cube = generator.Cubes.CreateBeltCube(color, slotWorld, generator.Current.transform);
+                var cube = _generator.Cubes.CreateBeltCube(color, slotWorld, _generator.Current.transform);
                 cube.originTruck = truck;
-                StartCoroutine(LaunchRoutine(cube, slotWorld, truck.dockPoint + Vector3.up * unstackHeight));
+                StartCoroutine(LaunchRoutine(cube, slotWorld, truck.dockPoint + Vector3.up * _unstackHeight));
 
-                yield return new WaitForSeconds(unstackInterval);
+                yield return new WaitForSeconds(_unstackInterval);
             }
 
             _unstacking.Remove(truck);
@@ -81,30 +82,30 @@ namespace GamePlay.Level
         {
             _pendingTransfers++;
             Vector3 axis = Random.onUnitSphere;
-            yield return MoveSpin(cube.transform, from, to, transferDuration, axis, null);
+            yield return MoveSpin(cube.transform, from, to, _transferDuration, axis, null);
 
-            generator.Belt.Place(cube.gameObject);
+            _generator.Belt.Place(cube.gameObject);
             var rb = cube.GetComponent<Rigidbody>();
-            if (rb != null) rb.angularVelocity = Random.onUnitSphere * landTumble;
+            if (rb != null) rb.angularVelocity = Random.onUnitSphere * _landTumble;
             _pendingTransfers--;
         }
 
         private void FixedUpdate()
         {
-            if (generator == null) return;
+            if (_generator == null) return;
 
             // Must reset even while _won, or the next level stays "won" and taps stay blocked.
-            if (generator.Current != _level)
+            if (_generator.Current != _level)
             {
                 StopAllCoroutines();
-                _level = generator.Current;
+                _level = _generator.Current;
                 _won = false;
                 _pendingTransfers = 0;
                 _unstacking.Clear();
                 _loading.Clear();
             }
 
-            var belt = generator.Belt;
+            var belt = _generator.Belt;
             if (_won || belt == null || belt.Count == 0) return;
 
             _scratch.Clear();
@@ -118,18 +119,18 @@ namespace GamePlay.Level
 
                 // Release the origin lock once the box has travelled away (prevents instant snap-back).
                 if (cube.originTruck != null &&
-                    HorizontalDistance(rb.position, cube.originTruck.dockPoint) > dockRadius)
+                    HorizontalDistance(rb.position, cube.originTruck.dockPoint) > _dockRadius)
                     cube.originTruck = null;
 
                 bool collectorExists = HasCollector(cube.color);
 
-                foreach (var truck in generator.Trucks)
+                foreach (var truck in _generator.Trucks)
                 {
                     if (truck == cube.originTruck) continue;
                     if (_unstacking.Contains(truck)) continue;
                     if (!truck.Accepts(cube.color)) continue;
                     if (truck.Count == 0 && collectorExists) continue;
-                    if (HorizontalDistance(rb.position, truck.dockPoint) > dockRadius) continue;
+                    if (HorizontalDistance(rb.position, truck.dockPoint) > _dockRadius) continue;
 
                     Dock(rb, cube, truck, belt);
                     break;
@@ -144,9 +145,9 @@ namespace GamePlay.Level
             var renderer = rb.GetComponentInChildren<Renderer>();
             Vector3 from = renderer != null ? renderer.bounds.center : rb.position;
             var color = cube.color;
-            generator.Cubes.Despawn(cube);
+            _generator.Cubes.Despawn(cube);
 
-            var stackCube = generator.Cubes.CreateStackCube(color);
+            var stackCube = _generator.Cubes.CreateStackCube(color);
             truck.AddCube(stackCube);
             Vector3 target = stackCube.transform.position;
             stackCube.transform.position = from;
@@ -159,7 +160,7 @@ namespace GamePlay.Level
         {
             _pendingTransfers++;
             Vector3 axis = Random.onUnitSphere;
-            yield return MoveSpin(t, from, to, transferDuration, axis, truck.transform.rotation);
+            yield return MoveSpin(t, from, to, _transferDuration, axis, truck.transform.rotation);
             if (t) { t.position = to; t.localRotation = Quaternion.identity; }
             _pendingTransfers--;
             RemoveLoading(truck);
@@ -168,7 +169,7 @@ namespace GamePlay.Level
 
         private bool HasCollector(CubeColor color)
         {
-            foreach (var truck in generator.Trucks)
+            foreach (var truck in _generator.Trucks)
                 if (!_unstacking.Contains(truck) && truck.Count > 0 && truck.TopColor == color && truck.HasSpace)
                     return true;
             return false;
@@ -201,11 +202,11 @@ namespace GamePlay.Level
                 if (endRotation.HasValue)
                 {
                     Quaternion baseRot = Quaternion.Slerp(startRot, endRotation.Value, k);
-                    t.rotation = Quaternion.AngleAxis(flightSpin * (1f - k), axis) * baseRot;
+                    t.rotation = Quaternion.AngleAxis(_flightSpin * (1f - k), axis) * baseRot;
                 }
                 else
                 {
-                    t.rotation = Quaternion.AngleAxis(flightSpin * k, axis) * startRot;
+                    t.rotation = Quaternion.AngleAxis(_flightSpin * k, axis) * startRot;
                 }
                 yield return null;
             }
@@ -217,7 +218,7 @@ namespace GamePlay.Level
         private void CheckWin(ConveyorBelt belt)
         {
             if (_won || _pendingTransfers > 0 || belt.Count > 0) return;
-            foreach (var truck in generator.Trucks)
+            foreach (var truck in _generator.Trucks)
                 if (truck.Count != 0 && !truck.IsComplete) return;
 
             _won = true;

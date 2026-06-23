@@ -3,13 +3,14 @@ using Data.Levels;
 using Game.Levels;
 using GamePlay.Entity;
 using UnityEngine;
+using UnityUtils.Attribute;
 
 namespace GamePlay.Level
 {
     public class LevelGenerator : MonoBehaviour
     {
-        [SerializeField] private ConveyorBuilder _conveyorBuilder;
-        [SerializeField] private CubeFactory _cubeFactory;
+        [SerializeField, AutoAssign] private ConveyorBuilder _conveyorBuilder;
+        [SerializeField, AutoAssign] private CubeFactory _cubeFactory;
         [SerializeField] private Truck _truckPrefab;
         [SerializeField] private float _cellGap = 0.1f;
         [SerializeField] private Vector3 _stackOrigin = Vector3.zero;
