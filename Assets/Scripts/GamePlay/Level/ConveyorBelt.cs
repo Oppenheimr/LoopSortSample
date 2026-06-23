@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Dreamteck.Splines;
 using UnityEngine;
 
-namespace Game.Levels
+namespace GamePlay.Level
 {
     public class ConveyorBelt : MonoBehaviour
     {

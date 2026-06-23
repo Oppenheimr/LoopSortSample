@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Core;
 using Data.Levels;
+using Game.Levels;
 using GamePlay.Entity;
 using UnityEngine;
 
-namespace Game.Levels
+namespace GamePlay.Level
 {
     public class CubeFactory : MonoBehaviour
     {

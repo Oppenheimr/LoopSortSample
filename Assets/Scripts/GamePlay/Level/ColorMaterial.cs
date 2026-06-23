@@ -1,7 +1,7 @@
 using Data.Levels;
 using UnityEngine;
 
-namespace Game.Levels
+namespace GamePlay.Level
 {
     [System.Serializable]
     public struct ColorMaterial

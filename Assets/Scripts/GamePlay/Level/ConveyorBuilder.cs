@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using Dreamteck.Splines;
+using Game.Levels;
 using UnityEngine;
 
-namespace Game.Levels
+namespace GamePlay.Level
 {
     public class ConveyorBuilder : MonoBehaviour
     {
