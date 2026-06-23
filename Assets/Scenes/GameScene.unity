@@ -443,7 +443,7 @@ GameObject:
   - component: {fileID: 447061122}
   - component: {fileID: 447061121}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Next Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -916,7 +916,7 @@ GameObject:
   - component: {fileID: 927968193}
   - component: {fileID: 927968192}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Start Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1153,9 +1153,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1d9b147ee883fe4ab65efd31fd74886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generator: {fileID: 175318002}
-  padding: 0.25
-  minDistance: 1
+  _cam: {fileID: 963194227}
+  _padding: 0.25
+  _minDistance: 1
 --- !u!1 &1174387291
 GameObject:
   m_ObjectHideFlags: 0
