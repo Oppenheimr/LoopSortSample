@@ -23,6 +23,7 @@ namespace GamePlay.Level
         public int Count => _cubes.Count;
         public IReadOnlyList<Rigidbody> Cubes => _cubes;
         public SplineComputer Computer => _spline;
+        public float HalfWidth => _halfWidth;
 
         public void Configure(SplineComputer spline, float speed, float acceleration, Spline.Direction direction,
             float halfWidth, float maxHeight)

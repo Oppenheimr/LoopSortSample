@@ -85,13 +85,40 @@ namespace GamePlay.Entity
             _stack.Add(cube);
         }
 
-        public Cube PopTop()
+        // Removes the top run of one color and returns it ordered like a snake by depth rows:
+        // front row first, then the next, alternating the X direction each row.
+        public List<Cube> TakeTopColorRun()
         {
-            if (_stack.Count == 0) return null;
-            int last = _stack.Count - 1;
-            var cube = _stack[last];
-            _stack.RemoveAt(last);
-            return cube;
+            var result = new List<Cube>();
+            if (_stack.Count == 0) return result;
+
+            var color = _stack[_stack.Count - 1].color;
+            int start = _stack.Count;
+            while (start - 1 >= 0 && _stack[start - 1].color == color) start--;
+
+            int perLayer = _cellW * _cellD;
+            var ordered = new List<(Cube cube, int x, int y, int depth)>();
+            for (int i = start; i < _stack.Count; i++)
+            {
+                int within = i % boxesPerCell;
+                int x = within % _cellW;
+                int z = (within % perLayer) / _cellW;
+                int y = within / perLayer;
+                int depth = (i / boxesPerCell) * _cellD + z;
+                ordered.Add((_stack[i], x, y, depth));
+            }
+            _stack.RemoveRange(start, _stack.Count - start);
+
+            ordered.Sort((a, b) =>
+            {
+                if (a.depth != b.depth) return b.depth.CompareTo(a.depth); // front row first
+                if (a.y != b.y) return b.y.CompareTo(a.y);
+                bool reversed = ((a.depth + a.y) & 1) == 1;
+                return reversed ? b.x.CompareTo(a.x) : a.x.CompareTo(b.x);
+            });
+
+            foreach (var entry in ordered) result.Add(entry.cube);
+            return result;
         }
     }
 }

@@ -20,6 +20,9 @@ namespace GamePlay.Level
         [SerializeField] private float _unstackHeight = 0.3f;
         [SerializeField] private float _flightSpin = 540f;
         [SerializeField] private float _landTumble = 6f;
+        [SerializeField] private float _arcHeight = 1.5f;
+        [SerializeField] private int _landSlots = 4;
+        [SerializeField, Range(0f, 1f)] private float _landFill = 0.7f;
 
         private readonly List<Rigidbody> _scratch = new();
         private readonly HashSet<Truck> _unstacking = new();
@@ -60,17 +63,22 @@ namespace GamePlay.Level
             if (truck.Count == 0) yield break;
 
             _unstacking.Add(truck);
-            var color = truck.TopColor;
 
-            while (truck.Count > 0 && truck.TopColor == color)
+            var run = truck.TakeTopColorRun();
+            Vector3 landBase = truck.dockPoint + Vector3.up * _unstackHeight;
+            Vector3 spreadAxis = RailDirectionAt(truck.dockPoint);
+
+            for (int i = 0; i < run.Count; i++)
             {
-                var popped = truck.PopTop();
+                var popped = run[i];
                 Vector3 slotWorld = popped.transform.position;
+                var color = popped.color;
                 _generator.Cubes.Despawn(popped);
 
                 var cube = _generator.Cubes.CreateBeltCube(color, slotWorld, _generator.Current.transform);
                 cube.originTruck = truck;
-                StartCoroutine(LaunchRoutine(cube, slotWorld, truck.dockPoint + Vector3.up * _unstackHeight));
+                Vector3 to = landBase + spreadAxis * LandOffset(i);
+                StartCoroutine(LaunchRoutine(cube, slotWorld, to));
 
                 yield return new WaitForSeconds(_unstackInterval);
             }
@@ -174,6 +182,24 @@ namespace GamePlay.Level
             return false;
         }
 
+        private float LandOffset(int index)
+        {
+            if (_landSlots <= 1 || _generator.Belt == null) return 0f;
+            float slot = Mathf.PingPong(index, _landSlots - 1);
+            float normalized = slot / (_landSlots - 1) * 2f - 1f; // -1 .. +1 sweep
+            return normalized * _generator.Belt.HalfWidth * _landFill;
+        }
+
+        private Vector3 RailDirectionAt(Vector3 worldPoint)
+        {
+            var belt = _generator.Belt;
+            if (belt == null || belt.Computer == null) return Vector3.forward;
+
+            Vector3 forward = belt.Computer.Project(worldPoint).forward;
+            forward.y = 0f;
+            return forward.sqrMagnitude > 1e-6f ? forward.normalized : Vector3.forward;
+        }
+
         private bool IsLoading(Truck truck) => _loading.TryGetValue(truck, out var n) && n > 0;
         private void AddLoading(Truck truck) => _loading[truck] = (_loading.TryGetValue(truck, out var n) ? n : 0) + 1;
         private void RemoveLoading(Truck truck)
@@ -196,7 +222,9 @@ namespace GamePlay.Level
                 elapsed += Time.deltaTime;
                 float k = Mathf.Clamp01(elapsed / duration);
 
-                t.position = Vector3.Lerp(from, to, Mathf.SmoothStep(0f, 1f, k));
+                Vector3 pos = Vector3.Lerp(from, to, Mathf.SmoothStep(0f, 1f, k));
+                pos.y += _arcHeight * 4f * k * (1f - k); // parabolic toss, peaks mid-flight
+                t.position = pos;
 
                 if (endRotation.HasValue)
                 {

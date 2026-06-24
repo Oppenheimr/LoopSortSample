@@ -17,9 +17,9 @@ namespace GamePlay.Level
 
         private const float CellSize = 1f;
         private const int CellCapacity = 4;
-        private const int CellWidth = 4;
-        private const int CellDepth = 2;
-        private const int CellHeight = 2;
+        private const int CellWidth = 6;
+        private const int CellDepth = 3;
+        private const int CellHeight = 3;
 
         private GameObject _current;
         private ConveyorBelt _belt;

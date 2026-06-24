@@ -171,8 +171,8 @@ MonoBehaviour:
   _conveyorBuilder: {fileID: 175318005}
   _cubeFactory: {fileID: 175318006}
   _truckPrefab: {fileID: -5595965562781693058, guid: e9fb829c1389b5a47a9f7b35af937b12, type: 3}
-  _cellGap: 0.75
-  _stackOrigin: {x: 0, y: 1.2, z: 4.5}
+  _cellGap: 0.65
+  _stackOrigin: {x: 0, y: 1.2, z: 4.75}
 --- !u!4 &175318003
 Transform:
   m_ObjectHideFlags: 0
@@ -202,8 +202,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _generator: {fileID: 175318002}
   _dockRadius: 0.9
-  _transferDuration: 0.15
-  _unstackInterval: 0.1
+  _transferDuration: 0.55
+  _unstackInterval: 0.02
   _unstackHeight: 0.3
   _flightSpin: 540
   _landTumble: 6
@@ -248,8 +248,8 @@ MonoBehaviour:
     material: {fileID: 2100000, guid: 6accb9ec6153947cbae3f2aff1e3c866, type: 2}
   - color: 4
     material: {fileID: 2100000, guid: ef2d2a3b39a22469989c5a63af9227e3, type: 2}
-  _stackPoolSize: 256
-  _beltPoolSize: 128
+  _stackPoolSize: 1024
+  _beltPoolSize: 1024
 --- !u!1 &313126963
 GameObject:
   m_ObjectHideFlags: 0
