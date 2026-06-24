@@ -14,6 +14,7 @@ namespace GamePlay.Level
         [SerializeField] private Truck _truckPrefab;
         [SerializeField] private float _cellGap = 0.1f;
         [SerializeField] private Vector3 _stackOrigin = Vector3.zero;
+        [SerializeField] private float _dockBackOffset = 2f;
 
         private const float CellSize = 1f;
         private const int CellCapacity = 4;
@@ -73,8 +74,10 @@ namespace GamePlay.Level
             truck.transform.localPosition = GridMapper.ToWorld(data.gridPosition, center, CellSize);
             truck.transform.localRotation = Quaternion.Euler(0f, data.rotationY, 0f);
 
+            // Dock at the truck's back (where the stack sits), projected onto the belt.
+            Vector3 backPoint = truck.transform.TransformPoint(new Vector3(0f, 0f, -_dockBackOffset));
             var spline = _belt != null ? _belt.Computer : null;
-            Vector3 dock = spline != null ? spline.Project(truck.transform.position).position : truck.transform.position;
+            Vector3 dock = spline != null ? spline.Project(backPoint).position : backPoint;
 
             int boxesPerCell = CellWidth * CellDepth * CellHeight;
             int capacity = CellCapacity * boxesPerCell;

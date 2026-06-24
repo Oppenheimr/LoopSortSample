@@ -10,14 +10,17 @@ namespace GamePlay.Level
         [SerializeField] private MeshFilter _conveyorBlock;
         [SerializeField] private float _speed = 3f;
         [SerializeField] private float _acceleration = 15f;
+        [SerializeField] private float _startDelay = 0.2f;
         [SerializeField] private Spline.Direction _direction = Spline.Direction.Forward;
         [SerializeField] private float _beltHalfWidth = 1.5f;
         [SerializeField] private float _beltMaxHeight = 2f;
 
+        [SerializeField, Min(2)] private int _splineSampleRate = 40;
+        [SerializeField] private float _cornerRadius = 4f;
+        [SerializeField, Range(1, 32)] private int _cornerSegments = 12;
+        [SerializeField, Min(1)] private int _meshSubdivisions = 4;
+
         private const Spline.Type SplineKind = Spline.Type.Linear;
-        private const int SplineSampleRate = 20;
-        private const float CornerRadius = 4f;
-        private const int CornerSegments = 6;
 
         public ConveyorBelt Build(IReadOnlyList<Vector2Int> splinePoints, Vector2 center, float cellSize, Transform parent)
         {
@@ -29,7 +32,7 @@ namespace GamePlay.Level
             var spline = go.AddComponent<SplineComputer>();
             spline.space = SplineComputer.Space.Local;
             spline.type = SplineKind;
-            spline.sampleRate = SplineSampleRate;
+            spline.sampleRate = _splineSampleRate;
 
             var positions = BuildPath(splinePoints, center, cellSize);
             var points = new SplinePoint[positions.Count];
@@ -43,23 +46,44 @@ namespace GamePlay.Level
             BuildMesh(spline, go.transform);
 
             var belt = go.AddComponent<ConveyorBelt>();
-            belt.Configure(spline, _speed, _acceleration, _direction, _beltHalfWidth, _beltMaxHeight);
+            belt.Configure(spline, _speed, _acceleration, _startDelay, _direction, _beltHalfWidth, _beltMaxHeight);
             return belt;
         }
 
-        private static List<Vector3> BuildPath(IReadOnlyList<Vector2Int> splinePoints, Vector2 center, float cellSize)
+        private List<Vector3> BuildPath(IReadOnlyList<Vector2Int> splinePoints, Vector2 center, float cellSize)
         {
             var raw = new List<Vector3>(splinePoints.Count);
             foreach (var p in splinePoints)
                 raw.Add(GridMapper.ToWorld(p, center, cellSize));
 
-            return RoundCorners(raw);
+            return RoundCorners(Simplify(raw));
         }
 
-        private static List<Vector3> RoundCorners(List<Vector3> pts)
+        // Drops points that sit on a straight run, leaving only real corners so the
+        // fillet edges are long and the radius isn't clamped down to a tiny value.
+        private List<Vector3> Simplify(List<Vector3> pts)
         {
             int n = pts.Count;
-            if (CornerRadius <= 0f || CornerSegments < 1 || n < 3) return pts;
+            if (n < 3) return pts;
+
+            var result = new List<Vector3>(n);
+            for (int i = 0; i < n; i++)
+            {
+                Vector3 a = pts[i] - pts[(i - 1 + n) % n];
+                Vector3 b = pts[(i + 1) % n] - pts[i];
+                if (a.sqrMagnitude < 1e-6f || b.sqrMagnitude < 1e-6f) continue;
+
+                if (Vector3.Dot(a.normalized, b.normalized) < 0.9999f)
+                    result.Add(pts[i]); // direction changes here → keep this corner
+            }
+
+            return result.Count >= 3 ? result : pts;
+        }
+
+        private List<Vector3> RoundCorners(List<Vector3> pts)
+        {
+            int n = pts.Count;
+            if (_cornerRadius <= 0f || _cornerSegments < 1 || n < 3) return pts;
 
             var result = new List<Vector3>();
             for (int i = 0; i < n; i++)
@@ -74,13 +98,13 @@ namespace GamePlay.Level
                 if (inLen < 1e-4f || outLen < 1e-4f) { result.Add(cur); continue; }
 
                 inDir /= inLen; outDir /= outLen;
-                float r = Mathf.Min(CornerRadius, inLen * 0.5f, outLen * 0.5f);
+                float r = Mathf.Min(_cornerRadius, inLen * 0.5f, outLen * 0.5f);
                 Vector3 start = cur - inDir * r;
                 Vector3 end = cur + outDir * r;
 
-                for (int s = 0; s <= CornerSegments; s++)
+                for (int s = 0; s <= _cornerSegments; s++)
                 {
-                    float t = (float)s / CornerSegments;
+                    float t = (float)s / _cornerSegments;
                     float u = 1f - t;
                     result.Add(u * u * start + 2f * u * t * cur + t * t * end);
                 }
@@ -116,6 +140,15 @@ namespace GamePlay.Level
                 go.GetComponent<MeshRenderer>().sharedMaterials = sourceRenderer.sharedMaterials;
 
             splineMesh.RebuildImmediate();
+
+            // A box only bends at the joints between copies; more (shorter) copies = smoother
+            // corners. autoCount fits one copy per block length, so multiply that count up.
+            if (_meshSubdivisions > 1)
+            {
+                channel.autoCount = false;
+                channel.count = Mathf.Max(1, channel.count * _meshSubdivisions);
+                splineMesh.RebuildImmediate();
+            }
 
             var collider = go.AddComponent<MeshCollider>();
             collider.sharedMesh = go.GetComponent<MeshFilter>().sharedMesh;

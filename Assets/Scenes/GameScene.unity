@@ -173,6 +173,7 @@ MonoBehaviour:
   _truckPrefab: {fileID: -5595965562781693058, guid: e9fb829c1389b5a47a9f7b35af937b12, type: 3}
   _cellGap: 0.65
   _stackOrigin: {x: 0, y: 1.2, z: 4.75}
+  _dockBackOffset: 2
 --- !u!4 &175318003
 Transform:
   m_ObjectHideFlags: 0
@@ -207,6 +208,9 @@ MonoBehaviour:
   _unstackHeight: 0.3
   _flightSpin: 540
   _landTumble: 6
+  _arcHeight: 1.5
+  _landSlots: 4
+  _landFill: 0.7
 --- !u!114 &175318005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,9 +226,14 @@ MonoBehaviour:
   _conveyorBlock: {fileID: 5427896164935348412, guid: 0e1011058ffc5474893d995bd8d19165, type: 3}
   _speed: 7
   _acceleration: 15
+  _startDelay: 0.2
   _direction: 1
   _beltHalfWidth: 0.45
   _beltMaxHeight: 2
+  _splineSampleRate: 32
+  _cornerRadius: 4
+  _cornerSegments: 12
+  _meshSubdivisions: 4
 --- !u!114 &175318006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1134,13 +1143,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 30, z: 0}
+  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
+  m_LocalPosition: {x: 0.0003528595, y: 29.32, z: -15.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0

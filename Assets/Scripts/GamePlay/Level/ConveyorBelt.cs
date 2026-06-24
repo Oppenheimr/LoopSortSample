@@ -8,6 +8,7 @@ namespace GamePlay.Level
     {
         [SerializeField] private float _speed = 3f;
         [SerializeField] private float _acceleration = 15f;
+        [SerializeField] private float _startDelay = 0.2f;
         [SerializeField] private Spline.Direction _direction = Spline.Direction.Forward;
 
         [Header("Containment (invisible walls)")]
@@ -18,6 +19,7 @@ namespace GamePlay.Level
         private SplineComputer _spline;
         private SplineSample _sample = new();
         private readonly List<Rigidbody> _cubes = new();
+        private readonly Dictionary<Rigidbody, float> _driveAt = new();
 
         public float Speed { get => _speed; set => _speed = value; }
         public int Count => _cubes.Count;
@@ -25,12 +27,13 @@ namespace GamePlay.Level
         public SplineComputer Computer => _spline;
         public float HalfWidth => _halfWidth;
 
-        public void Configure(SplineComputer spline, float speed, float acceleration, Spline.Direction direction,
-            float halfWidth, float maxHeight)
+        public void Configure(SplineComputer spline, float speed, float acceleration, float startDelay,
+            Spline.Direction direction, float halfWidth, float maxHeight)
         {
             _spline = spline;
             this._speed = speed;
             this._acceleration = acceleration;
+            this._startDelay = startDelay;
             this._direction = direction;
             this._halfWidth = halfWidth;
             this._maxHeight = maxHeight;
@@ -38,10 +41,16 @@ namespace GamePlay.Level
 
         public void Add(Rigidbody cube)
         {
-            if (cube != null && !_cubes.Contains(cube)) _cubes.Add(cube);
+            if (cube == null || _cubes.Contains(cube)) return;
+            _cubes.Add(cube);
+            _driveAt[cube] = Time.time + _startDelay; // settle briefly before the belt grabs it
         }
 
-        public void Remove(Rigidbody cube) => _cubes.Remove(cube);
+        public void Remove(Rigidbody cube)
+        {
+            _cubes.Remove(cube);
+            _driveAt.Remove(cube);
+        }
 
         public void Place(GameObject cube) => Add(Prepare(cube));
 
@@ -78,10 +87,14 @@ namespace GamePlay.Level
                 if (rb == null) { _cubes.RemoveAt(i); continue; }
 
                 _spline.Project(rb.position, ref _sample);
-                Vector3 tangent = _sample.forward.normalized * dir;
 
-                float along = Vector3.Dot(rb.velocity, tangent);
-                rb.AddForce(tangent * ((_speed - along) * _acceleration), ForceMode.Acceleration);
+                bool driving = !_driveAt.TryGetValue(rb, out float t) || Time.time >= t;
+                if (driving)
+                {
+                    Vector3 tangent = _sample.forward.normalized * dir;
+                    float along = Vector3.Dot(rb.velocity, tangent);
+                    rb.AddForce(tangent * ((_speed - along) * _acceleration), ForceMode.Acceleration);
+                }
 
                 Contain(rb);
             }
